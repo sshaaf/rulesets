@@ -1,0 +1,2 @@
+name: security
+description: The ruleset detects common java security vulnerabilities in Java code and provides suggestions to fixing them.

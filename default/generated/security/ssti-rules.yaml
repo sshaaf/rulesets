@@ -1,0 +1,78 @@
+- category: mandatory
+  customVariables: []
+  description: Unsafe String Interpolation with Script Execution
+  effort: 7
+  labels:
+  - konveyor.io/target=security
+  - konveyor.io/source
+  - ssti
+  links: []
+  message: The app is using unsafe string interpolation that allows script execution,
+    which may lead to Server-Side Template Injection (SSTI). To fix this, disable scripting
+    in interpolators by using a custom Lookup implementation or whitelist-based approach.
+    Example: Use `StringSubstitutor(new NoScriptLookup())` where `NoScriptLookup` prevents
+    script execution.
+  ruleID: ssti-interpolation-00001
+  when:
+    builtin.filecontent:
+      filePattern: .*\.(java|properties|jsp|jspf|tag|xml|txt|yaml)
+      pattern: \${script:(javascript|groovy|python|ruby):.*}
+
+- category: mandatory
+  customVariables: []
+  description: Use of StringSubstitutor with Scripting Enabled
+  effort: 7
+  labels:
+  - konveyor.io/target=security
+  - konveyor.io/source
+  - ssti
+  links: []
+  message: The app is using StringSubstitutor with scripting enabled, which may lead
+    to arbitrary code execution. To fix this, use a custom Lookup implementation that
+    disables scripting. Example: Replace `StringSubstitutor.createInterpolator()` with
+    `new StringSubstitutor(new SecureLookup())`, where `SecureLookup` enforces safe
+    variable substitution.
+  ruleID: ssti-stringsubstitutor-00002
+  when:
+    builtin.filecontent:
+      filePattern: .*\.(java)
+      pattern: StringSubstitutor.*createInterpolator.*\(\)|StringSubstitutor.*new.*\(.*\)
+
+- category: mandatory
+  customVariables: []
+  description: Potential SSTI Vulnerability in Replace Method
+  effort: 7
+  labels:
+  - konveyor.io/target=security
+  - konveyor.io/source
+  - ssti
+  links: []
+  message: The app is using the replace method of StringSubstitutor with potentially
+    unsafe input, which may lead to SSTI. To fix this, sanitize all inputs before interpolation
+    and ensure that no script execution is allowed. Example: Use a custom Lookup class
+    that rejects `${script:...}` syntax.
+  ruleID: ssti-replace-method-00003
+  when:
+    builtin.filecontent:
+      filePattern: .*\.(java)
+      pattern: StringSubstitutor.*replace.*\(".*\$\{script:.*\}\"
+
+- category: mandatory
+  customVariables: []
+  description: Use of Scripting Syntax in Strings
+  effort: 7
+  labels:
+  - konveyor.io/target=security
+  - konveyor.io/source
+  - ssti
+  links: []
+  message: The app contains strings with scripting syntax (\${script:...}), which
+    may indicate an SSTI vulnerability. To fix this, review and secure these usages
+    by replacing `${script:...}` with safe alternatives or disabling scripting entirely.
+    Example: Use `StringSubstitutor(new WhitelistLookup(whitelist))` to restrict allowed
+    variables.
+  ruleID: ssti-script-syntax-00004
+  when:
+    builtin.filecontent:
+      filePattern: .*\.(java|properties|jsp|jspf|tag|xml|txt|yaml)
+      pattern: \${script:(javascript|groovy|python|ruby):.*}
